@@ -4,20 +4,20 @@ import { Blog } from "../model/blogModel.js";
 
 export const createBlog = async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { name, description } = req.body;
 
-        if(!title) {
+        if(!name) {
             return res.status(400).json({ message: "blog name is missing" });
         }
-        if(!description) {
-            return res.status(400).json({ message: "description is missing" });
-        }
+        // if(!description) {
+        //     return res.status(400).json({ message: "description is missing" });
+        // }
        
-        const isBlogExist = await Blog.findOne({ name:req.body.title});
+        const isBlogExist = await Blog.findOne({ name:req.body.name});
 
-        if(!!isBlogExist) {
-            return res.status(400).json({ message: "blog name is existing...Please enter another one" });
-        }
+        // if(!!isBlogExist) {
+        //     return res.status(400).json({ message: "blog name is existing...Please enter another one" });
+        // }
 
         const newBlog = new Blog(req.body)
 

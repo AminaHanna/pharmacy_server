@@ -9,9 +9,9 @@ export const createCategory = async (req, res) => {
         if(!name) {
             return res.status(400).json({ message: "product name is missing" });
         }
-        if(!description) {
-            return res.status(400).json({ message: "description is missing" });
-        }
+        // if(!description) {
+        //     return res.status(400).json({ message: "description is missing" });
+        // }
        
         const isCategoryExist = await Category.findOne({ name:req.body.name});
 
@@ -65,7 +65,7 @@ export const deleteCategoryById = async (req, res) => {
 
 
 export const updateCategoryById = async (req, res) => {
-    console.log(req.params.id);
+    // console.log(req.params.id);
 
     try {
         if(!req.params.id) {

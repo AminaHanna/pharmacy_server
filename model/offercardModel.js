@@ -11,11 +11,12 @@ const offercardSchema = new mongoose.Schema({
     },
     timeline: {
         type: String,
-        required: [true, "Please add description"]
     },
     offerRate: {
         type: String,
-        required: [true, "Please add description"]
+    },
+    image:{
+        type:String,
     }
 },
     {

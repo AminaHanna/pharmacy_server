@@ -4,26 +4,26 @@ import { Offercard } from "../model/offercardModel.js";
 
 export const createCard = async (req, res) => {
     try {
-        const { title, description, timeline, offerRate } = req.body;
+        // const { title, description, timeline, offerRate } = req.body;
 
-        if(!title) {
-            return res.status(400).json({ message: "title is missing" });
-        }
-        if(!description) {
-            return res.status(400).json({ message: "description is missing" });
-        }
-        if(!timeline) {
-            return res.status(400).json({ message: "rate is missing" });
-        }
-        if(!offerRate) {
-            return res.status(400).json({ message: "offer-rate is missing" });
-        }
+        // if(!title) {
+        //     return res.status(400).json({ message: "title is missing" });
+        // }
+        // if(!description) {
+        //     return res.status(400).json({ message: "description is missing" });
+        // }
+        // if(!timeline) {
+        //     return res.status(400).json({ message: "rate is missing" });
+        // }
+        // if(!offerRate) {
+        //     return res.status(400).json({ message: "offer-rate is missing" });
+        // }
        
         const isCardExist = await Offercard.findOne({ name:req.body.title});
 
-        if(!!isCardExist) {
-            return res.status(400).json({ message: "card name is existing...Please enter another one" });
-        }
+        // if(!!isCardExist) {
+        //     return res.status(400).json({ message: "card name is existing...Please enter another one" });
+        // }
 
         const newCard = new Offercard(req.body)
 

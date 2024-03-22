@@ -1,13 +1,9 @@
 import mongoose from "mongoose";
 
-const bannerSchema = new mongoose.Schema({
+const banner3Schema = new mongoose.Schema({
     title: {
         type: String,
         required: [true, "Please add title"]
-    },
-    description: {
-        type: String,
-        required: [true, "Please add description about it"]
     },
     percentage: {
         type: String,
@@ -30,4 +26,4 @@ const bannerSchema = new mongoose.Schema({
     }
 );
 
-export const Banner = mongoose.model("Banner", bannerSchema);
+export const Banner3 = mongoose.model("Banner3", banner3Schema);

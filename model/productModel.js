@@ -16,7 +16,17 @@ const productSchema = new mongoose.Schema({
     delivery: {
         type: String,
         required: [true, "Please add the product name"]
-    }
+    },
+    image:[{
+        image:String
+    }],
+    mainImage:{
+        type:String,
+    },
+    dropdown:{
+        type:mongoose.Types.ObjectId,
+    },
+    
 },
     {
         timestamps: true

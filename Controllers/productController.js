@@ -4,33 +4,19 @@ import { Products } from "../model/productModel.js";
 
 export const createProduct = async (req, res) => {
     try {
-        const { name, details, price, delivery } = req.body;
+        const { name } = req.body;
 
         if(!name) {
             return res.status(400).json({ message: "product name is missing" });
         }
-        if(!details) {
-            return res.status(400).json({ message: "description is missing" });
-        }
-        if(!price) {
-            return res.status(400).json({ message: "price is missing" });
-        }
-        if(!delivery) {
-            return res.status(400).json({ message: "quantity is missing" });
-        }
+      
+        const isProductExist = await Products.findOne({ name: req.body.name});
 
-        const isProductExist = await Products.findOne({ name: name});
+        // if(!!isProductExist) {
+        //     return res.status(400).json({ message: "product name is existing...Please enter another one" });
+        // }
 
-        if(!!isProductExist) {
-            return res.status(400).json({ message: "product name is existing...Please enter another one" });
-        }
-
-        const newProduct = new Products({
-            name:name,
-            details:details,
-            price:price,
-            delivery:delivery
-        })
+        const newProduct = new Products(req.body)
 
         const createdProduct = await newProduct.save();
         return res.status(201).json({ data: createdProduct, message: "Successfully inserted product into db" });
@@ -41,7 +27,33 @@ export const createProduct = async (req, res) => {
 
 
 export const getProducts = async (req, res) => {
-    const Product = await Products.find()
+    const Product = await Products.aggregate([
+        {
+            $lookup:{
+                from:"categories",
+                localField:"dropdown",
+                foreignField:"_id",
+                as:"categoriesInfo"
+            }
+        },
+        {
+            $unwind: "$categoriesInfo"
+        }
+    ])
+    // console.log(Product);
+
+    if(Product.length === 0) {
+        return res.status(404).json("no entries yet");
+    } else {
+        return res.status(200).json({ products: Product });
+    }
+}
+
+
+export const getproductsByCategory = async (req, res) => {
+    
+    const Product = await Products.find({dropdown:new mongoose.Types.ObjectId(req.params.id)})
+    // console.log(new mongoose.Types.ObjectId(req.params.id));
 
     if(Product.length === 0) {
         return res.status(404).json("no entries yet");

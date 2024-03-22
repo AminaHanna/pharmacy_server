@@ -1,21 +1,19 @@
 import mongoose from "mongoose";
 
 const cartSchema = new mongoose.Schema({
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add user id"]
-    },
     productId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add Product id"]
     },
-    totalPrice: {
-        type: String,
-        required: [true, "Please add price"]
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
     },
+    quantity:{
+        type:Number,
+        default:1
+    }
 },
     {
-        timestamps: true
+        timestamps: true,
     }
 );
 

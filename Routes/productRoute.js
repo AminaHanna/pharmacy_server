@@ -1,7 +1,5 @@
 import { Router } from 'express'
-import multer from 'multer'
-import { createProduct, deleteProductById, getProductById, getProducts, updateProductById } from '../Controllers/productController.js';
-import mongoose from 'mongoose';
+import { createProduct, deleteProductById, getproductsByCategory,getProductById, getProducts, updateProductById } from '../Controllers/productController.js';
 
 const router = Router();
 
@@ -10,5 +8,7 @@ router.get('/', getProducts);
 router.get('/:id', getProductById);
 router.put('/:id', updateProductById);
 router.delete('/:id', deleteProductById);
+router.get('/getprroducts-bycat/:id', getproductsByCategory);
+
 
 export default router;
