@@ -9,6 +9,8 @@ export const createProduct = async (req, res) => {
         if(!name) {
             return res.status(400).json({ message: "product name is missing" });
         }
+
+       
       
         const isProductExist = await Products.findOne({ name: req.body.name});
 
@@ -26,7 +28,30 @@ export const createProduct = async (req, res) => {
 }
 
 
+export const searchProduct = async (req, res) => {
+
+
+    let filter = {};
+
+    if (req?.query?.name) {
+        // If there's a name query parameter, construct the filter with an exact match
+        filter = { name: { $regex: req.query.name, $options: 'i' } }; // Case insensitive regex pattern
+    } else if (req?.query?.pattern) {
+        // If there's a pattern query parameter, construct the filter with a pattern that includes "mobile"
+        filter = { name: { $regex: `.*${req.query.pattern}.*mobile.*`, $options: 'i' } }; // Case insensitive regex pattern
+    }
+    
+    const Product = await Products.find(filter);
+    
+  
+        return res.status(200).json({ products: Product });
+    
+}
+
+
 export const getProducts = async (req, res) => {
+
+
     const Product = await Products.aggregate([
         {
             $lookup:{
@@ -40,13 +65,12 @@ export const getProducts = async (req, res) => {
             $unwind: "$categoriesInfo"
         }
     ])
+    // const Product = await Products.find({name:req.query?.name ? req.query?.name : '' })
     // console.log(Product);
 
-    if(Product.length === 0) {
-        return res.status(404).json("no entries yet");
-    } else {
+  
         return res.status(200).json({ products: Product });
-    }
+    
 }
 
 

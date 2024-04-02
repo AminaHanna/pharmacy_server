@@ -4,19 +4,62 @@ import { Cart } from "../model/cartModel.js";
 
 export const addToCart = async (req, res) => {
     try {
- 
-        const newCart = new Cart(req.body)
-
-        const createCart = await newCart.save();
-        return res.status(201).json({ data: createCart, message: "Successfully inserted cart into db" });
+        const isExistProduct = await Cart.findOne({productId:new mongoose.Types.ObjectId(req.body.productId),
+            userId:new mongoose.Types.ObjectId(req.body.userId)
+        })
+        if(isExistProduct) {
+            const copy = {...isExistProduct._doc}
+            console.log(copy);
+            copy.quantity = copy.quantity+1;
+            const saveData = await Cart.findByIdAndUpdate(isExistProduct._id,{$set:copy},{new:true});
+            return res.status(201).json({ result: saveData,message: "Incremented" })
+        } else {
+            const newData = new Cart(req.body);
+            const saveData = await newData.save();
+            if (saveData) {
+                return res.status(201).json({ result: saveData,message: "Successfully inserted cart into db" })
+            }
+        }
     } catch (error) {
         return res.status(404).json({ message: error.message || 'error' });
     }
-}
+    // try {
+ 
+    //     const newCart = new Cart(req.body)
+
+    //     const createCart = await newCart.save();
+    //     return res.status(201).json({ data: createCart, message: "Successfully inserted cart into db" });
+    // } catch (error) {
+    //     return res.status(404).json({ message: error.message || 'error' });
+    // }
+};
+
+export const getAll = async (req, res) => {
+    try {
+    const getAll = await Cart.aggregate([
+        {
+            $lookup:{
+                from:"products",
+                localField:"productId",
+                foreignField:"_id",
+                as:"product"
+            }
+        },
+        {
+            $unwind:"$product" 
+        },
+    ])
+
+
+        return res.status(200).json({result:getAll});
+    } catch {
+        return res.status(404).json("no entries yet");
+    }
+};
 
 
 export const listCartByUser = async (req, res) => {
-    console.log(req.params.id,'req.body.userId');
+    // console.log(req.params.id,'req.body.userId');
     const cart = await Cart.aggregate([
         {
             $match:{ userId : new mongoose.Types.ObjectId(req.params.id)}
@@ -35,22 +78,12 @@ export const listCartByUser = async (req, res) => {
     ])
 
 
-    
-    // if(!cart){
-    //     return res.status(400).json({message:'cart not found'})
-    // }
-
-    // console.log(cart)
-    // return res.status(200).json({data:cart})
-
-
-
     if(cart.length === 0) {
         return res.status(404).json("no entries yet");
     } else {
         return res.status(200).json({ data: cart });
     }
-}
+};
 
 
 export const getById = async (req, res) => {
@@ -61,7 +94,7 @@ export const getById = async (req, res) => {
     }else {
         return res.status(404).json("no entries yet");
     }
-}
+};
 
 export const incrementCartQuantity = async (req, res) => {
     try {
@@ -80,6 +113,8 @@ export const incrementCartQuantity = async (req, res) => {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
+
+
 export const removeCartQuantity = async (req, res) => {
     try {
         // Find and remove the cart item by productId and userId
@@ -114,31 +149,3 @@ export const decrementCartQuantity  = async (req, res) => {
         return res.status(500).json({ message: error.message || 'Internal server error' });
     }
 };
-
-
-
-// export const deleteCategoryById = async (req, res) => {
-//     try {
-//         if(!req.params.id) {
-//             return res.status(400).json({ message: "error while deleting!!!" });
-//         }
-//         await Category.findByIdAndDelete(req.params.id)
-//         return res.status(200).json({ message: "deleted" });
-//     } catch(error) {
-//         return res.status(200).json({ message: error.message || 'error' });
-//     }
-// }
-
-
-// export const updateCategoryById = async (req, res) => {
-//     try {
-//         if(!req.params.id) {
-//             return res.status(400).json({ message: 'error while deleting!' });
-//         }
-
-//         await Category.findByIdAndUpdate(req.params.id,{$set:req.body});
-//         return res.status(200).json({ message: "updated" });
-//     } catch (error) {
-//         return res.status(400).json({ message: error.message || "updation error" })
-//     }
-// }

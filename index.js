@@ -12,7 +12,8 @@ import bannerRoute from "./Routes/bannerRoute.js";
 import banner2Route from "./Routes/banner2Route.js";
 import banner3Route from "./Routes/banner3Route.js";
 import cartRouter from "./Routes/cartRouter.js";
-
+import orderRouter from "./Routes/orderRouter.js";
+import wishlistRouter from "./Routes/wishlistRouter.js";
 
 
 
@@ -34,6 +35,8 @@ app.use('/api/banner', bannerRoute)
 app.use('/api/banner2', banner2Route)
 app.use('/api/banner3', banner3Route)
 app.use('/api/cart', cartRouter)
+app.use('/api/wishlist', wishlistRouter)
+app.use('/api/order', orderRouter)
 
 
 

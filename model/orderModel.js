@@ -1,21 +1,20 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    orderId: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the Order Id"]
-    },
     productId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the product id"]
     },
     cartId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the Order Id"]
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the product id"]
+    },
+    paymentId:{
+        type: mongoose.Schema.Types.ObjectId,
+    },
+    productsArray: {
+        type:Array
     }
 },
     {
