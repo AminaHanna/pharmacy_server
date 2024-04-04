@@ -3,6 +3,7 @@ import { Order } from "../model/orderModel.js";
 import { Payment } from "../model/paymentModel.js";
 import { Cart } from "../model/cartModel.js";
 import Razorpay from "razorpay";
+import crypto from "crypto";
 
 
 // const razorpay = new Razorpay({
@@ -56,6 +57,9 @@ export const createOrder =async (req, res) => {
         } catch (err) {
            res.status(400).send('Not able to create order. Please try again!');
         }
+
+
+
         return true;
 
         if(req.body.type==="cart"){
@@ -240,3 +244,37 @@ export const orderDelivered = async (req, res) => {
         console.log("Error while approving:", error);
     }
 };
+
+
+
+const secret_key = 'mpg2uvMb65GlFIIvkHOdR4nb'
+
+app.post('/paymentCapture', (req, res) => {
+
+   // do a validation
+
+const data = crypto.createHmac('sha256', secret_key)
+
+   data.update(JSON.stringify(req.body))
+
+   const digest = data.digest('hex')
+
+if (digest === req.headers['x-razorpay-signature']) {
+
+       console.log('request is legit')
+
+       //We can send the response and store information in a database.
+
+       res.json({
+
+           status: 'ok'
+
+       })
+
+} else {
+
+       res.status(400).send('Invalid signature');
+
+   }
+
+})
