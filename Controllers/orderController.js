@@ -35,64 +35,72 @@ export const createOrder =async (req, res) => {
         }
 
 
-        const razorpay = new Razorpay({
-            key_id: 'rzp_test_tjQX0dLAwK5ZRe',
-            key_secret: 'l6PExsujC6D9OioOyleXuR1M'
-          })
+        if(req.body.mode === 'online'){
+            const razorpay = new Razorpay({
+                key_id: 'rzp_test_tjQX0dLAwK5ZRe',
+                key_secret: 'l6PExsujC6D9OioOyleXuR1M'
+              })
+    
+              const options = {
+                amount: 1000*100,
+                currency: "INR",
+                receipt: `12345ABCD${Math.floor(Math.random())}`,
+                payment_capture: 1
+            };
+    
+    
+            try {
+                const response = await razorpay.orders.create(options)
+                res.json({
+                    order_id: response.id,
+                    currency: response.currency,
+                    amount: response.amount,
+                })
+            } catch (err) {
+               res.status(400).send('Not able to create order. Please try again!');
+            }
+        }else{
 
-          const options = {
-            amount: 1000*100,
-            currency: "INR",
-            receipt: `12345ABCD${Math.floor(Math.random())}`,
-            payment_capture: 1
-        };
 
+            if(req.body.type==="cart"){
 
-        try {
-            const response = await razorpay.orders.create(options)
-            res.json({
-                order_id: response.id,
-                currency: response.currency,
-                amount: response.amount,
-            })
-        } catch (err) {
-           res.status(400).send('Not able to create order. Please try again!');
-        }
+                const cartsss = await Cart.find({userId:new mongoose.Types.ObjectId(req.body.userId)})
+                console.log(cartsss,"ord");
+                let productsArray = []
+                for( let obj of cartsss){
+                    productsArray.push(obj.productId)
+               }
+               console.log(productsArray,"array");
+    
+                const newOrder = new Order({...req.body,productsArray:productsArray})
+                const orderSaved = await newOrder.save() 
+                const newPayment = new Payment({...req.body,orderId:orderSaved._id})
+                await Order.findByIdAndUpdate(orderSaved._id,{$set:{paymentId:newPayment._id}})
+                const paymentSaved = await newPayment.save();
+                // res.json(newOrder);
+                for( let obj of cartsss){
+                    await Cart.findByIdAndDelete(obj._id)
+               }
 
-
-
-        return true;
-
-        if(req.body.type==="cart"){
-
-            const Orders = await Cart.find({userId:new mongoose.Types.ObjectId(req.body.userId)})
-            console.log(Orders,"ord");
-            let productsArray = []
-            for( let obj of Orders){
-                productsArray.push(obj.productId)
-           }
-           console.log(productsArray,"array");
-
-            const newOrder = new Order({...req.body,productsArray:productsArray})
+                return res.status(201).json({ message: 'order success' });
+                
+            } else {
+                 
+            const newOrder = new Order(req.body)
+            
             const orderSaved = await newOrder.save() 
             const newPayment = new Payment({...req.body,orderId:orderSaved._id})
             await Order.findByIdAndUpdate(orderSaved._id,{$set:{paymentId:newPayment._id}})
             const paymentSaved = await newPayment.save();
-            // res.json(newOrder);
-            return res.status(201).json({ message: 'order success' });
             
-        } else {
-             
-        const newOrder = new Order(req.body)
-        
-        const orderSaved = await newOrder.save() 
-        const newPayment = new Payment({...req.body,orderId:orderSaved._id})
-        await Order.findByIdAndUpdate(orderSaved._id,{$set:{paymentId:newPayment._id}})
-        const paymentSaved = await newPayment.save();
-        
-        return res.status(201).json({ message: 'order success' });
+            return res.status(201).json({ message: 'order success' });
+            }
+
+            
+
         }
 
+        
     } catch (error) {
         return res.status(404).json({ message: error.message || 'error' });      
     }
