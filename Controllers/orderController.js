@@ -4,6 +4,7 @@ import { Payment } from "../model/paymentModel.js";
 import { Cart } from "../model/cartModel.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import express from "express";
 
 
 // const razorpay = new Razorpay({
@@ -35,12 +36,12 @@ export const createOrder =async (req, res) => {
 
 
         const razorpay = new Razorpay({
-            key_id: 'rzp_test_H0JW7KXTkvpj4p',
-            key_secret: 'r5PVx9y34zYDmFybBsgK61iE'
+            key_id: 'rzp_test_tjQX0dLAwK5ZRe',
+            key_secret: 'l6PExsujC6D9OioOyleXuR1M'
           })
 
           const options = {
-            amount: 1000,
+            amount: 1000*100,
             currency: "INR",
             receipt: `12345ABCD${Math.floor(Math.random())}`,
             payment_capture: 1
@@ -247,34 +248,57 @@ export const orderDelivered = async (req, res) => {
 
 
 
-const secret_key = 'mpg2uvMb65GlFIIvkHOdR4nb'
+// export const payment = async (req,res)=>{
 
-app.post('/paymentCapture', (req, res) => {
+//     const secret_key = 'l6PExsujC6D9OioOyleXuR1M'
 
-   // do a validation
+// const {orderId,paymentId,signature  }  = req.body.orderDetails
+//     console.log(req.body.orderDetails);
 
-const data = crypto.createHmac('sha256', secret_key)
+//     let newww = orderId + "|" + paymentId
+// const data = crypto.createHmac('sha256', secret_key).update(newww.toString())
 
-   data.update(JSON.stringify(req.body))
+//    const digest = data === signature
 
-   const digest = data.digest('hex')
+//    console.log(digest,'dd');
 
-if (digest === req.headers['x-razorpay-signature']) {
+// if (digest === req.headers['x-razorpay-signature']) {
 
-       console.log('request is legit')
+//        console.log('request is legit')
 
-       //We can send the response and store information in a database.
+//        //We can send the response and store information in a database.
 
-       res.json({
+//        res.json({
 
-           status: 'ok'
+//            status: 'ok'
 
-       })
+//        })
 
-} else {
+//     } else {
+//        res.status(400).send('Invalid signature');
+//     }
+// }
 
-       res.status(400).send('Invalid signature');
 
-   }
 
-})
+export const payment = async (req, res) => {
+    try {
+        const secret_key = 'l6PExsujC6D9OioOyleXuR1M';
+        const { orderId, paymentId, signature } = req.body.orderDetails;
+        const expectedSignature = crypto.createHmac('sha256', secret_key).update(orderId + "|" + paymentId).digest('hex');
+
+        if (signature === expectedSignature) {
+            console.log('Request signature is valid');
+
+            // Update order status or perform other actions here
+
+            return res.status(200).json({ status: 'ok' });
+        } else {
+            console.log('Invalid signature');
+            return res.status(400).send('Invalid signature');
+        }
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        return res.status(500).send('Error processing payment');
+    }
+}

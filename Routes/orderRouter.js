@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { createOrder, getById, getOrders,getOrdersByUserId, orderApproved, orderPending, orderShipped, orderDelivered } from "../Controllers/orderController.js";
+import { createOrder, getById, getOrders,getOrdersByUserId, orderApproved, orderPending, orderShipped, orderDelivered,payment } from "../Controllers/orderController.js";
 
 const router = Router();
 
 router.post('/', createOrder);
+router.post('/payment', payment);
 router.get('/:id', getOrders);
 router.post('/approved/:id', orderApproved);
 router.post('/pending/:id', orderPending);
