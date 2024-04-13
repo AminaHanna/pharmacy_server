@@ -81,6 +81,7 @@ export const createOrder =async (req, res) => {
                 for( let obj of cartsss){
                     await Cart.findByIdAndDelete(obj._id)
                }
+               
 
                 return res.status(201).json({ message: 'order success' });
                 
