@@ -65,6 +65,7 @@ export const createOrder = async (req, res) => {
         for (let obj of cartsss) {
           productsArray.push(obj.productId);
         }
+        
 
         const newOrder = new Order({
           ...req.body,
