@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema({
     },
     productsArray: {
         type:Array
-    }
+    },
 },
     {
         timestamps: true

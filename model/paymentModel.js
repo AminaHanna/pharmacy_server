@@ -32,6 +32,9 @@ const paymentSchema = new mongoose.Schema({
         enum: ["pending", "shipped","accepted","approved", "delivered"],
         default: "pending",
     },
+    amount:{
+        type:String
+    }
 },
     {
         timestamps: true,
