@@ -14,6 +14,7 @@ import banner3Route from "./Routes/banner3Route.js";
 import cartRouter from "./Routes/cartRouter.js";
 import orderRouter from "./Routes/orderRouter.js";
 import wishlistRouter from "./Routes/wishlistRouter.js";
+import couponRouter from "./Routes/couponRoute.js";
 
 
 
@@ -37,6 +38,8 @@ app.use('/api/banner3', banner3Route)
 app.use('/api/cart', cartRouter)
 app.use('/api/wishlist', wishlistRouter)
 app.use('/api/order', orderRouter)
+app.use('/api/coupon', couponRouter)
+
 
 
 

@@ -29,7 +29,7 @@ const paymentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "shipped","accepted","approved", "delivered"],
+        enum: ["pending", "shipped","accepted","approved", "delivered",'processing'],
         default: "pending",
     },
     amount:{

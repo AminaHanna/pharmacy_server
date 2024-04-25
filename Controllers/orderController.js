@@ -4,13 +4,8 @@ import { Payment } from "../model/paymentModel.js";
 import { Cart } from "../model/cartModel.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
-import express from "express";
 import { Products } from "../model/productModel.js";
 
-// const razorpay = new Razorpay({
-//     key_id: 'rzp_test_H0JW7KXTkvpj4p',
-//     key_secret: 'r5PVx9y34zYDmFybBsgK61iE'
-//   })
 
 export const createOrder = async (req, res) => {
   try {
@@ -45,10 +40,34 @@ export const createOrder = async (req, res) => {
         payment_capture: 1,
       };
 
+      // ---------------------------
+
+      const newOrder = new Order(req.body);
+
+        const orderSaved = await newOrder.save();
+        const newPayment = new Payment({
+          ...req.body,
+          orderId: orderSaved._id,
+        });
+        await Order.findByIdAndUpdate(orderSaved._id, {
+          $set: { paymentId: newPayment._id },
+        });
+        const paymentSaved = await newPayment.save();
+
+        // return res.status(201).json({ message: "order success" });
+
+      // -----------------------------
+
       try {
         const response = await razorpay.orders.create(options);
+        await Payment.findByIdAndUpdate(newPayment._id, {
+          $set: { status:"processing" },
+        });
+       
+        
         res.json({
           order_id: response.id,
+          user_payment_id: newPayment._id,
           currency: response.currency,
           amount: response.amount,
         });
@@ -95,9 +114,8 @@ export const createOrder = async (req, res) => {
           ...req.body,
           orderId: orderSaved._id,
         });
-        await Order.findByIdAndUpdate(orderSaved._id, {
-          $set: { paymentId: newPayment._id },
-        });
+     
+        
         const paymentSaved = await newPayment.save();
 
         return res.status(201).json({ message: "order success" });
@@ -328,24 +346,34 @@ export const orderDelivered = async (req, res) => {
 // }
 
 export const payment = async (req, res) => {
+
+  console.log('api');
+  console.log(req.body);
   try {
     const secret_key = "l6PExsujC6D9OioOyleXuR1M";
-    const { orderId, paymentId, signature } = req.body.orderDetails;
-    const expectedSignature = crypto
-      .createHmac("sha256", secret_key)
-      .update(orderId + "|" + paymentId)
-      .digest("hex");
+    const { orderId, paymentId, signature, } = req.body.orderDetails;
 
-    if (signature === expectedSignature) {
+    const { user_payment_id} = req.body
+    // const expectedSignature = crypto
+    //   .createHmac("sha256", secret_key)
+    //   .update(orderId + "|" + paymentId)
+    //   .digest("hex");
+
+    //   console.log(expectedSignature,'-----');
+
+    // if (signature === expectedSignature) {
       console.log("Request signature is valid");
 
       // Update order status or perform other actions here
 
-      return res.status(200).json({ status: "ok" });
-    } else {
-      console.log("Invalid signature");
-      return res.status(400).send("Invalid signature");
-    }
+      // } else {
+        // console.log("Invalid signature");
+        // return res.status(400).send("Invalid signature");
+        // }
+        await Payment.findByIdAndUpdate(user_payment_id, {
+          $set: { status:'paid' },
+        });
+        return res.status(200).json({ status: "ok" });
   } catch (error) {
     console.error("Error processing payment:", error);
     return res.status(500).send("Error processing payment");
